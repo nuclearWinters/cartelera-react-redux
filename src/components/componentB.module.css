@@ -1,3 +1,7 @@
 .root {
     color: crimson
 }
+
+:global .rootGlobal { 
+    color: blue;
+}
