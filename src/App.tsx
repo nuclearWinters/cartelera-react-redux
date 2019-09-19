@@ -54,11 +54,8 @@ const App: FC = () => {
     const onChange = (value: Moment) => {
       const data = [...result.items];
       data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = value.toISOString();
-      console.log(cellInfo.column.id)
       const columnaPorModificar = cellInfo.column.id === "Inicio exhibición" ? "Fin exhibición" : "Inicio exhibición"
-      console.log(columnaPorModificar)
       data[cellInfo.index][columnaPorModificar] = cellInfo.column.id === "Inicio exhibición" ? value.add(data[cellInfo.index].Duración, "hours").toISOString() : value.subtract(data[cellInfo.index].Duración, "hours").toISOString()
-      console.log(data[cellInfo.index][columnaPorModificar])
       dispatch(fetchPeliculasSuccess(data))
     }
     const data = [...result.items];
