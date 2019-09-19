@@ -7,11 +7,9 @@ export const fetchPeliculasSuccess = (peliculas: Pelicula[]) => ({
 })
 
 export const fetchPeliculas = () => (dispatch: any) => {
-    axios.get("http://192.168.0.7:3001/get-movie")
+    axios.get("http://localhost:3001/get-movie")
     .then(peliculas => {
         dispatch(fetchPeliculasSuccess(peliculas.data))
-        //dispatchPeliculas(peliculas.data)
-        /*setDispatchnow(false)*/
     })
     .catch(err => console.log(err))
 }

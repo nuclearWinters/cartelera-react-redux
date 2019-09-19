@@ -9,8 +9,16 @@ import TimePicker from 'rc-time-picker';
 import 'rc-time-picker/assets/index.css';
 //import Login from "react-signup-login-component"
 import moment, { Moment } from "moment"
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import sesionImg from "./imgs/45bab675f2f10124f08d54290addcf3c.png"
+import { EnhancedWrapped } from "./components/AuthHelperMethods"
+import AuthHelperMethods from "./components/funciones"
+import Modal from 'react-modal';
 
 const App: FC = () => {
+
+  const Auth = new AuthHelperMethods();
 
   const dispatch = useDispatch()
 
@@ -25,18 +33,32 @@ const App: FC = () => {
   const result : any = useSelector<any, any>(state => state.peliculas)
   
   const renderEditableText = (cellInfo: CellInfo) => {
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if(e.keyCode === 13){
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    }
     return (
         <div
           style={{ backgroundColor: "#fafafa" }}
           contentEditable
           suppressContentEditableWarning
+          onKeyDown={handleKeyPress}
           onBlur={e => {
             const data = [...result.items];
             data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = e.target.innerHTML;
+            if (cellInfo.column.id === "Duración") {
+              const value = moment(data[cellInfo.index]["Inicio exhibición"])
+              data[cellInfo.index]["Fin exhibición"] = value.add(data[cellInfo.index].Duración, "hours").toISOString()
+              dispatch(fetchPeliculasSuccess(data))
+            } else{
+              dispatch(fetchPeliculasSuccess(data))
+            }
             //const objectWithData = data[cellInfo.index]
             //delete objectWithData._id
-            console.log(data)
-            dispatch(fetchPeliculasSuccess(data))
+            
             //axios.put("http://192.168.0.7:3001/admin-put-movie", {token, pelicula: data[cellInfo.index]})
             //.then(response => {
             //  setDispatchnow(true)
@@ -50,26 +72,34 @@ const App: FC = () => {
   }
 
   const renderEditableDate = (cellInfo: CellInfo) => {
-    const format = 'h:mm a';
-    const onChange = (value: Moment) => {
-      const data = [...result.items];
-      data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = value.toISOString();
-      const columnaPorModificar = cellInfo.column.id === "Inicio exhibición" ? "Fin exhibición" : "Inicio exhibición"
-      data[cellInfo.index][columnaPorModificar] = cellInfo.column.id === "Inicio exhibición" ? value.add(data[cellInfo.index].Duración, "hours").toISOString() : value.subtract(data[cellInfo.index].Duración, "hours").toISOString()
-      dispatch(fetchPeliculasSuccess(data))
+    const handleDateORTime = (value: Moment | Date | null) => {
+      if (value) {
+        value = moment(value)
+        const data = [...result.items]
+        data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = value.toISOString()
+        const columnaPorModificar = cellInfo.column.id === "Inicio exhibición" ? "Fin exhibición" : "Inicio exhibición"
+        data[cellInfo.index][columnaPorModificar] = cellInfo.column.id === "Inicio exhibición" ? value.add(data[cellInfo.index].Duración, "hours").toISOString() : value.subtract(data[cellInfo.index].Duración, "hours").toISOString()
+        dispatch(fetchPeliculasSuccess(data))
+      }
     }
     const data = [...result.items];
-    const now = moment(data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)])
+    const nowDate = new Date(data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)])
+    const nowMoment = moment(nowDate)
     return (
         <div
           style={{ backgroundColor: "#fafafa", display: "flex", alignItems: "center", justifyContent: "center" }}
         >
+          <DatePicker
+            selected={nowDate}
+            onChange={handleDateORTime}
+          />
           <TimePicker
-            value={now}
+            clearIcon={<div></div>}
+            value={nowMoment}
             showSecond={false}
             className="xxx"
-            onChange={onChange}
-            format={format}
+            onChange={handleDateORTime}
+            format={'h:mm a'}
             use12Hours
             inputReadOnly
           />
@@ -79,6 +109,22 @@ const App: FC = () => {
 
   return (
     <div>
+      <div style={{backgroundColor: "#23282d", color: "#eee", fontSize: 13, fontWeight: 400, height: 32, display: "flex", justifyContent: "flex-end", position: "fixed", top: 0, left: 0, right: 0, bottom: 32, zIndex: 100}}>
+        <div className="perfil" style={{display: "flex", height: 32, alignItems: "center"}} >
+          <div style={{marginRight: 10, marginLeft: 10}}>Inicia sesión</div>
+          <img style={{marginRight: 10}} src={sesionImg} height={18} width={18} />
+          <div className="perfilOpciones" style={{position: "fixed", top: 32, right: 0, color: "black", backgroundColor: "#23282d"}}>
+            <div className="perfilWrapped" style={{padding: "20px 15px", display: "flex"}}>
+              <img src={sesionImg} height={64} width={64} />
+              <div style={{display: "flex", flexDirection: "column", margin: "0px 10px"}}>
+                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>Mi nombre</div>
+                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>Iniciar sesión</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
       <ReactTable
         data={result.items}
         columns={[
@@ -111,6 +157,7 @@ const App: FC = () => {
         defaultPageSize={10}
         className="-striped -highlight"
       />
+      <EnhancedWrapped />
     </div>
   );
 }
