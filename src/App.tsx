@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useCallback } from 'react';
+import React, { FC, useEffect, useCallback, useState } from 'react';
 import './App.css';
 // Import React Table
 import ReactTable, { CellInfo } from "react-table";
@@ -16,7 +16,20 @@ import { EnhancedWrapped } from "./components/AuthHelperMethods"
 import AuthHelperMethods from "./components/funciones"
 import Modal from 'react-modal';
 
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
+
 const App: FC = () => {
+
+  const [modalIsOpen, setModalIsOpen] = useState(false)
 
   const Auth = new AuthHelperMethods();
 
@@ -107,8 +120,33 @@ const App: FC = () => {
     );
   }
 
+  const openModal = () => {
+    setModalIsOpen(true)
+  }
+ 
+  const closeModal = () => {
+    setModalIsOpen(false)
+  }
+
   return (
     <div>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <h2>Hello</h2>
+        <button onClick={closeModal}>close</button>
+        <div>I am a modal</div>
+        <form>
+          <input />
+          <button>tab navigation</button>
+          <button>stays</button>
+          <button>inside</button>
+          <button>the modal</button>
+        </form>
+      </Modal>
       <div style={{backgroundColor: "#23282d", color: "#eee", fontSize: 13, fontWeight: 400, height: 32, display: "flex", justifyContent: "flex-end", position: "fixed", top: 0, left: 0, right: 0, bottom: 32, zIndex: 100}}>
         <div className="perfil" style={{display: "flex", height: 32, alignItems: "center"}} >
           <div style={{marginRight: 10, marginLeft: 10}}>Inicia sesión</div>
@@ -118,7 +156,7 @@ const App: FC = () => {
               <img src={sesionImg} height={64} width={64} />
               <div style={{display: "flex", flexDirection: "column", margin: "0px 10px"}}>
                 <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>Mi nombre</div>
-                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>Iniciar sesión</div>
+                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}} onClick={openModal}>Iniciar sesión</div>
               </div>
             </div>
           </div>
