@@ -8,7 +8,7 @@ const initialState: CarteleraPeliculasTypes = {
     items: [],
 }
 
-export default function posts(state = initialState, action: CarteleraTypes ) {
+export default function peliculas(state = initialState, action: CarteleraTypes ) {
     console.log(action.type, action.payload)
     switch(action.type) {
         case FETCH_PELICULAS:

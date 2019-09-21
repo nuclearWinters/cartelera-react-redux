@@ -35,3 +35,7 @@
 .perfil:hover .perfilOpciones .perfilWrapped {
     background-color: rgba(255, 255, 255, .1)
 }
+
+.ReactTable .rt-noData {
+    z-index: -1 !important;
+}

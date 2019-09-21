@@ -1,22 +1,26 @@
 //functional HOC with useState hook
 import React, { useState, useEffect } from 'react';
 import AuthHelperMethods from "./funciones"
+import { fetchTokenSuccess } from "../actions/loginActions"
+import { useDispatch } from "react-redux"
 
 function withCountState(Wrapped: any) {
+    
     const Auth = new AuthHelperMethods();
     return function (...props: any) {
+        const dispatch = useDispatch()
         const [count, setCount] = useState(0);
-        const [confirm, setConfirm] = useState(null);
         const [loaded, setLoaded] = useState(false);
         useEffect(() => {
-            if (!Auth.loggedIn()) {
+            let isLogged = Auth.loggedIn()
+            if (!isLogged) {
                 console.log("Not logged")
             }
             else {
                 try {
                     const confirm = Auth.getConfirm()
                     console.log("confirmation is:", confirm);
-                    setConfirm(confirm)
+                    dispatch(fetchTokenSuccess(confirm.Nombre, confirm.Usuario))
                     setLoaded(true)
                 }
                 catch (err) {
@@ -29,21 +33,15 @@ function withCountState(Wrapped: any) {
         props['setCount'] = setCount;
         ///return <Wrapped  />;
         if (loaded === true) {
-            if (confirm) {
-                console.log("confirmed!")
-                return (
-                    <Wrapped history={props.history} {...props} confirm={confirm} />
-                )
-            }
-            else {
-                console.log("not confirmed!")
-                return null
-            }
+            console.log("confirmed!")
+            return (
+                <Wrapped history={props.history} {...props} />
+            )
         }
         else {
+            console.log("not confirmed!")
             return null
         }
-        
     }
 }
 
