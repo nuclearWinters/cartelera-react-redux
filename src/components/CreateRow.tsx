@@ -145,7 +145,7 @@ export default function CreateRow() {
                     </div>
                 </div>
             <button style={{marginBottom: 20}} onClick={() => {
-                axios.post("http://localhost:3001/post-movie", {
+                axios.post("https://cartelera-node.herokuapp.com/post-movie", {
                     Titulo: titulo,
                     Director: director,
                     Duración: Number(duracion),

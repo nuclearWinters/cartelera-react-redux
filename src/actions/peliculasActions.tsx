@@ -7,7 +7,7 @@ export const fetchPeliculasSuccess = (peliculas: Pelicula[]) => ({
 })
 
 export const fetchPeliculas = () => (dispatch: any) => {
-    axios.get("http://localhost:3001/get-movie")
+    axios.get("https://cartelera-node.herokuapp.com/get-movie")
     .then(peliculas => {
         dispatch(fetchPeliculasSuccess(peliculas.data))
     })

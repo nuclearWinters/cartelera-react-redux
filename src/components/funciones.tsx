@@ -6,7 +6,7 @@ export default class AuthHelperMethods {
 
     //login = (Usuario: string, Contraseña: string) => {
     //    // Get a token from api server using the fetch api
-    //    return this.fetch(`http://localhost:3001/sing-in`, {
+    //    return this.fetch(`https://cartelera-node.herokuapp.com/sing-in`, {
     //        userInput: {
     //            Usuario,
     //            Contraseña

@@ -19,7 +19,7 @@ export const fetchTokenModalSuccess = (isOpenModal: boolean) => ({
 })
 
 export const fetchToken = (Usuario: string, Contraseña: string) => (dispatch: any) => {
-    axios.post(`http://localhost:3001/sing-in`, {userInput: {
+    axios.post(`https://cartelera-node.herokuapp.com/sing-in`, {userInput: {
         Usuario,
         Contraseña
     }})
