@@ -4,16 +4,16 @@ import ReactTable, { CellInfo } from "react-table";
 import "react-table/react-table.css";
 import { useSelector, useDispatch } from "react-redux"
 import { fetchPeliculas, fetchPeliculasSuccess } from "./actions/peliculasActions"
-import { fetchToken, fetchTokenSuccess, fetchTokenModalSuccess } from "./actions/loginActions"
+import { fetchToken, fetchTokenModalSuccess } from "./actions/loginActions"
 import TimePicker from 'rc-time-picker';
 import 'rc-time-picker/assets/index.css';
 import moment, { Moment } from "moment"
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import sesionImg from "./imgs/45bab675f2f10124f08d54290addcf3c.png"
 import { EnhancedWrapped } from "./components/AuthHelperMethods"
-import AuthHelperMethods from "./components/funciones"
 import Modal from 'react-modal';
+import CreateRow from "./components/CreateRow"
+import FixedHeader from "./components/FixedHeader"
 
 const customStyles = {
   content : {
@@ -31,9 +31,6 @@ const App: FC = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
-
-  const Auth = new AuthHelperMethods();
-
   const dispatch = useDispatch()
 
   const initFetch = useCallback(() => {
@@ -44,9 +41,7 @@ const App: FC = () => {
     initFetch();
   }, [initFetch]);
 
-  const result : any = useSelector<any, any>(state => state.peliculas)
-
-  const usuario : any = useSelector<any, any>(state => state.token.Usuario)
+  const peliculas : any = useSelector<any, any>(state => state.peliculas)
 
   const modalIsOpen : any = useSelector<any, any>(state => state.token.isOpenModal)
   
@@ -65,11 +60,11 @@ const App: FC = () => {
           suppressContentEditableWarning
           onKeyDown={handleKeyPress}
           onBlur={e => {
-            const data = [...result.items];
+            const data = [...peliculas.items];
             data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = e.target.innerHTML;
             if (cellInfo.column.id === "Duración") {
               const value = moment(data[cellInfo.index]["Inicio exhibición"])
-              data[cellInfo.index]["Fin exhibición"] = value.add(data[cellInfo.index].Duración, "hours").toISOString()
+              data[cellInfo.index]["Fin exhibición"] = value.add(data[cellInfo.index].Duración, "minutes").toISOString()
               dispatch(fetchPeliculasSuccess(data))
             } else{
               dispatch(fetchPeliculasSuccess(data))
@@ -83,7 +78,7 @@ const App: FC = () => {
             //})
           }}
           dangerouslySetInnerHTML={{
-            __html: result.items[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : ""]
+            __html: peliculas.items[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : ""]
           }}
         />
     );
@@ -93,14 +88,14 @@ const App: FC = () => {
     const handleDateORTime = (value: Moment | Date | null) => {
       if (value) {
         value = moment(value)
-        const data = [...result.items]
+        const data = [...peliculas.items]
         data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)] = value.toISOString()
         const columnaPorModificar = cellInfo.column.id === "Inicio exhibición" ? "Fin exhibición" : "Inicio exhibición"
-        data[cellInfo.index][columnaPorModificar] = cellInfo.column.id === "Inicio exhibición" ? value.add(data[cellInfo.index].Duración, "hours").toISOString() : value.subtract(data[cellInfo.index].Duración, "hours").toISOString()
+        data[cellInfo.index][columnaPorModificar] = cellInfo.column.id === "Inicio exhibición" ? value.add(data[cellInfo.index].Duración, "minutes").toISOString() : value.subtract(data[cellInfo.index].Duración, "minutes").toISOString()
         dispatch(fetchPeliculasSuccess(data))
       }
     }
-    const data = [...result.items];
+    const data = [...peliculas.items];
     const nowDate = new Date(data[cellInfo.index][cellInfo.column.id ? cellInfo.column.id : String(cellInfo.column.id)])
     const nowMoment = moment(nowDate)
     return (
@@ -123,10 +118,6 @@ const App: FC = () => {
           />
         </div>
     );
-  }
-
-  const openModal = () => {
-    dispatch(fetchTokenModalSuccess(true))
   }
  
   const closeModal = () => {
@@ -152,28 +143,22 @@ const App: FC = () => {
           }}>Iniciar sesión</button>
         </div>
       </Modal>
-      <div style={{backgroundColor: "#23282d", color: "#eee", fontSize: 13, fontWeight: 400, height: 32, display: "flex", justifyContent: "flex-end", position: "fixed", top: 0, left: 0, right: 0, bottom: 32, zIndex: 100}}>
-        <div className="perfil" style={{display: "flex", height: 32, alignItems: "center"}} >
-          <div style={{marginRight: 10, marginLeft: 10}}>{usuario ? usuario : "Inicia sesión"}</div>
-          <img style={{marginRight: 10}} src={sesionImg} height={18} width={18} />
-          <div className="perfilOpciones" style={{position: "fixed", top: 32, right: 0, color: "black", backgroundColor: "#23282d"}}>
-            <div className="perfilWrapped" style={{padding: "20px 15px", display: "flex"}}>
-              <img src={sesionImg} height={64} width={64} />
-              <div style={{display: "flex", flexDirection: "column", margin: "0px 10px"}}>
-                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>{usuario ? usuario : "Mi usuario"}</div>
-                <div style={{color: "#eee", flex: 1, display: "flex", justifyContent: "center", alignItems: "center"}} onClick={
-                  usuario ? () => {
-                  Auth.logout()
-                  dispatch(fetchTokenSuccess(null, null))
-                } : openModal}>{usuario ? "Cerrar sesión" : "Iniciar sesión"}</div>
+      <FixedHeader />
+      <CreateRow />
+      <div className="ReactTable -striped -highlight">
+        <div className="rt-table">
+          <div className="rt-thead -header">
+            <div className="rt-tr" style={{border: "1px solid rgba(0,0,0,0.05)"}}>
+              <div className="rt-th rt-resizable-header" style={{flex: 1, width: 100}}>
+                <div className="rt-resizable-header-content">Películas en cartela</div>
+                <div className="rt-resizer"></div>
               </div>
             </div>
           </div>
         </div>
-        
       </div>
       <ReactTable
-        data={result.items}
+        data={peliculas.items}
         columns={[
           {
             Header: "Título",

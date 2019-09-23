@@ -13,7 +13,6 @@ const initialState: CarteleraTokenTypes = {
 }
 
 export default function token(state = initialState, action: CarteleraTypes ) {
-    console.log(action.type, action.payload)
     switch(action.type) {
         case FETCH_TOKEN:
             return {
